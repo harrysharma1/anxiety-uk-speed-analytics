@@ -22,7 +22,7 @@ func read_urls() []string {
 
 func analyse_page() {
 	const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed`
-	const key = `DO NOT COMMIT KEY`
+	const key = `DONOTCOMMITKEY`
 	urlList := read_urls()
 
 	for i := range urlList {
