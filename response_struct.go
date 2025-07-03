@@ -3,6 +3,7 @@ package main
 type PageSpeedResponse struct {
 	CaptchaResult           string           `json:"captchaResult"`
 	Kind                    string           `json:"kind"`
+	ID                      string           `json:"id"`
 	LoadingExperience       Experience       `json:"loadingExperience"`
 	OriginLoadingExperience Experience       `json:"originLoadingExperience"`
 	LighthouseResult        LighthouseResult `json:"lighthouseResult"`
