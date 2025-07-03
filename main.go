@@ -7,6 +7,8 @@ import (
 	"os"
 	"runtime"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 func read_urls() []string {
@@ -20,9 +22,15 @@ func read_urls() []string {
 	return urlList
 }
 
-func analyse_page() {
+func analyse_pages() {
 	const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed`
-	const key = `DONOTCOMMITKEY`
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+
+	key := os.Getenv("API_KEY")
+
 	urlList := read_urls()
 
 	for i := range urlList {
@@ -42,5 +50,5 @@ func analyse_page() {
 
 func main() {
 	fmt.Printf("OS: %s\nArchitecture: %s\n", runtime.GOOS, runtime.GOARCH)
-	analyse_page()
+	analyse_pages()
 }
