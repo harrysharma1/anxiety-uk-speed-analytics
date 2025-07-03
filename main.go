@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,8 @@ import (
 
 	"github.com/joho/godotenv"
 )
+
+const FILENAME = "pages_speed.csv"
 
 func read_urls() []string {
 	file, err := os.ReadFile("urllist.txt")
@@ -34,7 +37,7 @@ func p_print(responseStruct PageSpeedResponse) {
 	fmt.Printf("- Cumulative Layout Shift (CLS): %s (%s)\n", responseStruct.LighthouseResult.Audits["cumulative-layout-shift"].DisplayValue, responseStruct.LoadingExperience.Metrics["CUMULATIVE_LAYOUT_SHIFT_SCORE"].Category)
 	fmt.Printf("- Total Blocking Time (TBT): %s\n", responseStruct.LighthouseResult.Audits["total-blocking-time"].DisplayValue)
 	fmt.Printf("- Speed Index: %s\n", responseStruct.LighthouseResult.Audits["speed-index"].DisplayValue)
-	fmt.Printf("Time Stamp (UTC): %s\n\n", responseStruct.AnalysisUTCTimeStamp)
+	fmt.Printf("Time Stamp (UTC): %s\n", responseStruct.AnalysisUTCTimeStamp)
 }
 
 func analyse_pages() {
@@ -74,9 +77,69 @@ func analyse_page(i int) {
 	}
 
 	p_print(responseStruct)
+	store_csv(responseStruct)
+}
+
+func init_csv() {
+	file, err := os.Create(FILENAME)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	headers := []string{
+		"URL",
+		"Core Vitals Assessment",
+		"First Contentful Paint (FCP)",
+		"Largest Contentful Paint (LCP)",
+		"Cumulative Layout Shift (CLS)",
+		"Total Blocking Time (TBT)",
+		"Speed Index",
+		"Timestamp (UTC)",
+	}
+
+	errHeader := writer.Write(headers)
+	if errHeader != nil {
+		panic(errHeader)
+	}
+}
+
+func store_csv(responseStruct PageSpeedResponse) {
+	file, err := os.OpenFile(FILENAME, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	record := []string{
+		responseStruct.ID,
+		responseStruct.LoadingExperience.OverallCategory,
+		fmt.Sprintf("%s (%s)", responseStruct.LighthouseResult.Audits["first-contentful-paint"].DisplayValue, responseStruct.LoadingExperience.Metrics["FIRST_CONTENTFUL_PAINT_MS"].Category),
+		fmt.Sprintf("%s (%s)", responseStruct.LighthouseResult.Audits["largest-contentful-paint"].DisplayValue, responseStruct.LoadingExperience.Metrics["LARGEST_CONTENTFUL_PAINT_MS"].Category),
+		fmt.Sprintf("%s (%s)", responseStruct.LighthouseResult.Audits["cumulative-layout-shift"].DisplayValue, responseStruct.LoadingExperience.Metrics["CUMULATIVE_LAYOUT_SHIFT_SCORE"].Category),
+		responseStruct.LighthouseResult.Audits["total-blocking-time"].DisplayValue,
+		responseStruct.LighthouseResult.Audits["speed-index"].DisplayValue,
+		responseStruct.AnalysisUTCTimeStamp,
+	}
+
+	errRecord := writer.Write(record)
+	if errRecord != nil {
+		panic(errRecord)
+	}
+
+	fmt.Printf("✅ CSV record written successfully for %s\n\n", responseStruct.ID)
+
 }
 
 func main() {
 	// fmt.Printf("OS: %s\nArchitecture: %s\n", runtime.GOOS, runtime.GOARCH)
+	init_csv()
+
 	analyse_pages()
 }
