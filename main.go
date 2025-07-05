@@ -32,7 +32,7 @@ func p_print(responseStruct PageSpeedResponse) {
 		fmt.Println("Core Web Vitals: Passed")
 	}
 	fmt.Println("Metrics:")
-	fmt.Printf("- First Contentful Paint (FCB): %s (%s)\n", responseStruct.LighthouseResult.Audits["first-contentful-paint"].DisplayValue, responseStruct.LoadingExperience.Metrics["FIRST_CONTENTFUL_PAINT_MS"].Category)
+	fmt.Printf("- First Contentful Paint (FCP): %s (%s)\n", responseStruct.LighthouseResult.Audits["first-contentful-paint"].DisplayValue, responseStruct.LoadingExperience.Metrics["FIRST_CONTENTFUL_PAINT_MS"].Category)
 	fmt.Printf("- Largest Contentful Paint (LCP): %s (%s)\n", responseStruct.LighthouseResult.Audits["largest-contentful-paint"].DisplayValue, responseStruct.LoadingExperience.Metrics["LARGEST_CONTENTFUL_PAINT_MS"].Category)
 	fmt.Printf("- Cumulative Layout Shift (CLS): %s (%s)\n", responseStruct.LighthouseResult.Audits["cumulative-layout-shift"].DisplayValue, responseStruct.LoadingExperience.Metrics["CUMULATIVE_LAYOUT_SHIFT_SCORE"].Category)
 	fmt.Printf("- Total Blocking Time (TBT): %s\n", responseStruct.LighthouseResult.Audits["total-blocking-time"].DisplayValue)
@@ -59,7 +59,7 @@ func analyse_page(i int) {
 
 	urlList := read_urls()
 
-	fmt.Printf("Running analysis on url: \"%s\"...\n", urlList[i])
+	fmt.Printf("(%d/%d) Running analysis on url: \"%s\"...\n", i+1, len(urlList), urlList[i])
 	fullEndpoint := fmt.Sprintf("%s?url=%s&key=%s", endpoint, urlList[i], key)
 	resp, err := http.Get(fullEndpoint)
 	if err != nil {
@@ -77,7 +77,7 @@ func analyse_page(i int) {
 	}
 
 	p_print(responseStruct)
-	store_csv(responseStruct)
+	// store_csv(responseStruct)
 }
 
 func init_csv() {
@@ -139,7 +139,8 @@ func store_csv(responseStruct PageSpeedResponse) {
 
 func main() {
 	// fmt.Printf("OS: %s\nArchitecture: %s\n", runtime.GOOS, runtime.GOARCH)
-	init_csv()
+	//init_csv()
 
 	analyse_pages()
+
 }
