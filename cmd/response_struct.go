@@ -1,4 +1,4 @@
-package main
+package cmd
 
 type PageSpeedResponse struct {
 	CaptchaResult           string           `json:"captchaResult"`

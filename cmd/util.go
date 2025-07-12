@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"encoding/csv"
@@ -134,13 +134,5 @@ func store_csv(responseStruct PageSpeedResponse) {
 	}
 
 	fmt.Printf("✅ CSV record written successfully for %s\n\n", responseStruct.ID)
-
-}
-
-func main() {
-	// fmt.Printf("OS: %s\nArchitecture: %s\n", runtime.GOOS, runtime.GOARCH)
-	//init_csv()
-
-	analyse_pages()
 
 }
