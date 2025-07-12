@@ -26,7 +26,8 @@ var singleCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-
+		url := args[0]
+		analysePageUrl(url, Verbose)
 	},
 }
 

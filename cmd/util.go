@@ -144,3 +144,38 @@ func storeCsv(responseStruct PageSpeedResponse) {
 	fmt.Printf("✅ CSV record written successfully for %s\n\n", responseStruct.ID)
 
 }
+
+func analysePageUrl(url string, verbose bool) {
+	const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed`
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+
+	key := os.Getenv("API_KEY")
+
+	if verbose {
+		fmt.Printf("Running analysis on url: \"%s\"...\n", url)
+	}
+	fullEndpoint := fmt.Sprintf("%s?url=%s&key=%s", endpoint, url, key)
+	resp, err := http.Get(fullEndpoint)
+	if err != nil {
+		panic(err)
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	var responseStruct PageSpeedResponse
+	errDecode := json.Unmarshal(body, &responseStruct)
+	if errDecode != nil {
+		panic(errDecode)
+	}
+
+	if verbose {
+		fmt.Printf("%+v\n", responseStruct)
+	} else {
+		pPrint(responseStruct)
+	}
+}
