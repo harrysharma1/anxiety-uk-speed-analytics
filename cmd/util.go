@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -14,7 +15,13 @@ import (
 
 const FILENAME = "pages_speed.csv"
 
-func read_urls() []string {
+func isValidURL(url string) bool {
+	var pattern = `^(http|https)://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/[a-zA-Z0-9-._~:?#@!$&'()*+,;=]*)*$`
+	urlRegex := regexp.MustCompile(pattern)
+	return urlRegex.MatchString(url)
+}
+
+func readUrls() []string {
 	file, err := os.ReadFile("urllist.txt")
 	if err != nil {
 		panic(err)
@@ -25,7 +32,7 @@ func read_urls() []string {
 	return urlList
 }
 
-func p_print(responseStruct PageSpeedResponse) {
+func pPrint(responseStruct PageSpeedResponse) {
 	if responseStruct.LoadingExperience.OverallCategory == "SLOW" || responseStruct.LoadingExperience.OverallCategory == "AVERAGE" {
 		fmt.Println("Core Web Vitals: Failed")
 	} else {
@@ -40,15 +47,15 @@ func p_print(responseStruct PageSpeedResponse) {
 	fmt.Printf("Time Stamp (UTC): %s\n", responseStruct.AnalysisUTCTimeStamp)
 }
 
-func analyse_pages() {
-	urlList := read_urls()
+func analysePages() {
+	urlList := readUrls()
 
 	for i := range urlList {
-		analyse_page(i)
+		analysePage(i)
 	}
 }
 
-func analyse_page(i int) {
+func analysePage(i int) {
 	const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed`
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -57,7 +64,7 @@ func analyse_page(i int) {
 
 	key := os.Getenv("API_KEY")
 
-	urlList := read_urls()
+	urlList := readUrls()
 
 	fmt.Printf("(%d/%d) Running analysis on url: \"%s\"...\n", i+1, len(urlList), urlList[i])
 	fullEndpoint := fmt.Sprintf("%s?url=%s&key=%s", endpoint, urlList[i], key)
@@ -76,11 +83,11 @@ func analyse_page(i int) {
 		panic(errDecode)
 	}
 
-	p_print(responseStruct)
+	pPrint(responseStruct)
 	// store_csv(responseStruct)
 }
 
-func init_csv() {
+func initCsv() {
 	file, err := os.Create(FILENAME)
 	if err != nil {
 		panic(err)
@@ -107,7 +114,7 @@ func init_csv() {
 	}
 }
 
-func store_csv(responseStruct PageSpeedResponse) {
+func storeCsv(responseStruct PageSpeedResponse) {
 	file, err := os.OpenFile(FILENAME, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err != nil {
 		panic(err)

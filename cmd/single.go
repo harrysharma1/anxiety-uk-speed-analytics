@@ -19,13 +19,14 @@ var singleCmd = &cobra.Command{
 		}
 
 		url := args[0]
-		fmt.Printf("URL: %s\n", url)
+		if !isValidURL(url) {
+			return fmt.Errorf("%s is not a valid URL format", url)
+		}
 
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("url called")
-		fmt.Print(args)
+
 	},
 }
 
