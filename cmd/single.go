@@ -19,7 +19,7 @@ var singleCmd = &cobra.Command{
 		}
 
 		url := args[0]
-		if !isValidURL(url) {
+		if !isValidUrl(url) {
 			return fmt.Errorf("%s is not a valid URL format", url)
 		}
 

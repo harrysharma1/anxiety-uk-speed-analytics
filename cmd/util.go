@@ -15,7 +15,8 @@ import (
 
 const FILENAME = "pages_speed.csv"
 
-func isValidURL(url string) bool {
+// Taken from: https://qodex.ai/all-tools/url-regex-go-validator
+func isValidUrl(url string) bool {
 	var pattern = `^(http|https)://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/[a-zA-Z0-9-._~:?#@!$&'()*+,;=]*)*$`
 	urlRegex := regexp.MustCompile(pattern)
 	return urlRegex.MatchString(url)
